@@ -743,5 +743,55 @@ boot();setTimeout(()=>{const h=Q('.hlogo')[0];if(h)Q('.lgs').forEach(e=>{e.style
   };
 </script>
 
+ <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, setDoc, doc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+      apiKey: "AIzaSyAjSr_VJXStfSunzTyWa6PvGLHR8a1ZiKQ",
+      authDomain: "misrashop.firebaseapp.com",
+      databaseURL: "https://misrashop-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "misrashop",
+      storageBucket: "misrashop.firebasestorage.app",
+      messagingSenderId: "14447331143",
+      appId: "1:14447331143:web:837fff0a6c27e1fa9bae62"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Load cloud products automatically when the page opens
+  async function initCloudSync() {
+      try {
+          const querySnapshot = await getDocs(collection(db, "products"));
+          if (!querySnapshot.empty) {
+              DB.products = [];
+              querySnapshot.forEach(docSnap => {
+                  DB.products.push(docSnap.data());
+              });
+              if (typeof renderHome === 'function') renderHome();
+              if (typeof grid === 'function') grid();
+              console.log("Loaded products from Firebase cloud!");
+          }
+      } catch (e) {
+          console.error("Error loading cloud products:", e);
+      }
+  }
+  initCloudSync();
+
+  // Automatically sync product updates to Firebase cloud
+  const originalSave = window.save || function() {};
+  window.save = async function(edit) {
+      originalSave(edit);
+      try {
+          for (const p of DB.products) {
+              await setDoc(doc(db, "products", p.id), p);
+          }
+          console.log("Products synced to Firebase cloud successfully!");
+      } catch (e) {
+          console.error("Cloud sync error:", e);
+      }
+  };
+</script>
 </body>
 </html>
