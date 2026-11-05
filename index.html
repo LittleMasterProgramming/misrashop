@@ -705,5 +705,48 @@ boot();setTimeout(()=>{const h=Q('.hlogo')[0];if(h)Q('.lgs').forEach(e=>{e.style
     </script>
   </body>
 </html>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, setDoc, doc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  // Initialize Firestore using your configuration
+  const app = initializeApp(window.MISRA_FIREBASE);
+  const db = getFirestore(app);
+
+  // Hook into your global save function so products sync instantly to Firebase
+  const originalSave = window.save || function() {};
+  window.save = async function(edit) {
+      originalSave(edit);
+      try {
+          // Push every product to Firestore cloud database
+          for (const p of DB.products) {
+              await setDoc(doc(db, "products", p.id), p);
+          }
+          console.log("Synced to cloud successfully!");
+      } catch (e) {
+          console.error("Cloud sync error: ", e);
+      }
+  };
+
+  // Load cloud products automatically when the page opens
+  async function initCloudSync() {
+      try {
+          const querySnapshot = await getDocs(collection(db, "products"));
+          if (!querySnapshot.empty) {
+              DB.products = [];
+              querySnapshot.forEach(docSnap => {
+                  DB.products.push(docSnap.data());
+              });
+              if (typeof renderHome === 'function') renderHome();
+              if (typeof grid === 'function') grid();
+              console.log("Loaded products from cloud!");
+          }
+      } catch (e) {
+          console.error("Error loading cloud products: ", e);
+      }
+  }
+  initCloudSync();
+</script>
 </body>
 </html>
