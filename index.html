@@ -6,17 +6,8 @@
 <title>MISRA – Fashion that Speaks Your Language</title>
 <meta name="description" content="MISRA – ladies' dresses, shoes, ethnic wear, bags and jewellery in Bangladesh. Cash on delivery.">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<script>window.MISRA_FIREBASE={apiKey:"AIzaSyAjSr_VJXStfSunzTyWa6PvGLHR8a1ZiKQ",authDomain:"misrashop.firebaseapp.com",projectId:"misrashop",storageBucket:"misrashop.firebasestorage.app",messagingSenderId:"14447331143",appId:"1:14447331143:web:837fff0a6c27e1fa9bae62"};</script>
 <style>
- <script>
-window.MISRA_FIREBASE={
-  apiKey: "AIzaSyAjSr_VJXStfSunzTyWa6PvGLHR8a1ZiKQ",
-  authDomain: "misrashop.firebaseapp.com",
-  projectId: "misrashop",
-  storageBucket: "misrashop.firebasestorage.app",
-  messagingSenderId: "14447331143",
-  appId: "1:14447331143:web:837fff0a6c27e1fa9bae62"
-};
-</script>
 :root{--f:'Poppins','Segoe UI',Arial,sans-serif;--bg:#120e0f;--bg2:#1a1415;--card:#1f1819;--ln:#ffffff1d;--tx:#f6efe8;--mu:#aa9e97;--ac:#e4b7a0;--ac2:#c9a27e;--ink:#120e0f;--veil:#120e0fd9;--lf:none;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 [data-theme=light]{--bg:#faf5f0;--bg2:#f3ebe3;--card:#fff;--ln:#2a1b1b1c;--tx:#2a1b1b;--mu:#7b6c66;--ac:#b4705a;--ac2:#a88357;--ink:#fff;--veil:#faf5f0e0;--lf:invert(1);color-scheme:light}
@@ -320,7 +311,7 @@ const fmt=n=>'৳'+Math.round(n).toLocaleString('en-US');
 const LS={g:(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},s:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){toast('Storage is full. Remove large images or export a backup.');return false}}};
 /* ===== config ===== */
 const CFG={GOOGLE_CLIENT_ID:''};
-const STAFF={srabonti:{h:'990aa93016b4169b1cf82caf9d9da8690f9e183df9b1483beaf3c01017fa6527',role:'owner',name:'Srabonti'},safwaan:{h:'9cba3bca3d0419fe0fb88f9c228f30cb67798b789026b98eda775b9400963f20',role:'manager',name:'Safwaan'}};
+const STAFF_OLD={srabonti:{h:'990aa93016b4169b1cf82caf9d9da8690f9e183df9b1483beaf3c01017fa6527',role:'owner',name:'Srabonti'},safwaan:{h:'9cba3bca3d0419fe0fb88f9c228f30cb67798b789026b98eda775b9400963f20',role:'manager',name:'Safwaan'}};
 const sha=async s=>{if(!(window.crypto&&crypto.subtle))throw 0;const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')};
 /* ===== data ===== */
 const CATS=['Dresses','Shoes','Salwar Kameez','Cosmetics','Ethnic','Bags','Jewellery','Tops'];
@@ -355,7 +346,7 @@ const SEED=[
 const mkp=(r,i)=>({id:'p'+(i+1),name:r[0],cat:r[1],art:r[2],price:r[3],sale:r[4],stock:r[5],sizes:ONE.includes(r[2])?SZ.one:(r[1]==='Shoes'?SZ.shoe:SZ.cl),colors:r[6],tags:r[7],feat:!!r[8],status:'pub',img:'',desc:r[9],created:Date.now()-i*86400000,reviews:[]});
 const defaults=()=>({products:SEED.map(mkp),orders:[],users:[],coupons:[{code:'WELCOME10',type:'pct',val:10,min:0,on:true}],settings:{ann:'Free delivery on orders over ৳3,000 · Cash on Delivery nationwide',dhaka:60,out:120,free:3000,dDays:'1–2',oDays:'3–5',low:3},edited:false});
 let DB=LS.g('misra.db',null);
-const save=(edit)=>{if(edit)DB.edited=true;LS.s('misra.db',DB)};
+const save=(edit)=>{if(edit)DB.edited=true;LS.s('misra.db',DB);pushSoon()};
 const S={cart:LS.g('misra.cart',[]),wish:LS.g('misra.wish',[]),rec:LS.g('misra.rec',[]),lang:LS.g('misra.lang','en'),theme:LS.g('misra.theme','dark'),user:null};
 S.user=(()=>{try{return JSON.parse(sessionStorage.getItem('misra.staff'))||LS.g('misra.user',null)}catch(e){return LS.g('misra.user',null)}})();
 const P=id=>DB.products.find(p=>p.id===id),pr=p=>p.sale||p.price,isStaff=()=>S.user&&(S.user.role==='owner'||S.user.role==='manager');
@@ -396,7 +387,7 @@ const cartCount=()=>S.cart.reduce((a,i)=>a+i.q,0);
 const sub=()=>S.cart.reduce((a,i)=>{const p=P(i.pid);return a+(p?pr(p)*i.q:0)},0);
 let COUP=LS.g('misra.coupon',null);
 function disc(){if(!COUP)return 0;const c=DB.coupons.find(x=>x.code===COUP&&x.on);if(!c||sub()<c.min)return 0;return c.type==='pct'?Math.round(sub()*c.val/100):Math.min(c.val,sub())}
-function saveCart(){LS.s('misra.cart',S.cart);const n=cartCount();$('cn').hidden=!n;$('cn').textContent=n;$('wb').hidden=!S.wish.length;$('wb').textContent=S.wish.length;LS.s('misra.wish',S.wish);renderCart()}
+function saveCart(){meSoon();LS.s('misra.cart',S.cart);const n=cartCount();$('cn').hidden=!n;$('cn').textContent=n;$('wb').hidden=!S.wish.length;$('wb').textContent=S.wish.length;LS.s('misra.wish',S.wish);renderCart()}
 function addCart(pid,size,color,q,quiet){const p=P(pid);if(!p||p.stock<1){toast(tr('Out of stock'));return false}
  const ex=S.cart.find(i=>i.pid===pid&&i.size===size&&i.color===color);const cur=ex?ex.q:0;if(cur+q>p.stock){toast(`Only ${p.stock} in stock`);return false}
  if(ex)ex.q+=q;else S.cart.push({pid,size,color,q});saveCart();if(!quiet)toast('Added to your cart');return true}
@@ -474,16 +465,16 @@ function renderCheckout(){const c=$('co');if(!S.cart.length){c.innerHTML=`<div c
  const calc=()=>{const z=$('cz').value,free=(s-d)>=DB.settings.free,f=free?0:(z==='dhaka'?DB.settings.dhaka:DB.settings.out);$('cdl').textContent=free?'Free':fmt(f);$('ctt').textContent=fmt(s-d+f);window.DF=f};$('cz').onchange=calc;calc();
  $('cof').onsubmit=async e=>{e.preventDefault();const ph=$('cp1').value.replace(/[\s-]/g,'');if(!/^(\+?88)?01[3-9]\d{8}$/.test(ph)){toast('Please enter a valid Bangladeshi mobile number');return}
   for(const i of S.cart){const p=P(i.pid);if(!p||p.stock<i.q){toast(`${p?p.name:'An item'} is no longer available in that quantity`);return}}
-  const id='MS-'+new Date().toISOString().slice(2,10).replace(/-/g,'').slice(0,4)+'-'+Math.random().toString(36).slice(2,6).toUpperCase();
+  const id='MS-'+new Date().toISOString().slice(2,10).replace(/-/g,'').slice(0,4)+'-'+Math.random().toString(36).slice(2,10).toUpperCase();
   const items=S.cart.map(i=>{const p=P(i.pid);return{pid:i.pid,name:p.name,size:i.size,color:i.color,q:i.q,price:pr(p)}});
   const o={id,items,sub:s,disc:d,coupon:d?COUP:'',fee:window.DF,total:s-d+window.DF,name:$('cn1').value.trim(),phone:ph.slice(-11),email:$('ce1').value.trim(),zone:$('cz').value,addr:$('ca').value.trim(),note:$('cno').value.trim(),status:'Placed',pay:'Cash on Delivery',created:Date.now(),hist:[{s:'Placed',t:Date.now()}],uid:S.user?S.user.email||S.user.name:''};
-  items.forEach(it=>{P(it.pid).stock-=it.q});DB.orders.push(o);save(true);LS.s('misra.addr',{name:o.name,phone:o.phone,addr:o.addr});
+  items.forEach(it=>{P(it.pid).stock-=it.q});DB.orders.push(o);save(true);api('order',{method:'POST',body:o}).then(r=>{if(r.ok&&r.j.order){Object.assign(o,r.j.order);ORD[o.id]=JSON.stringify(o)}else if(r.status===409&&r.j)toast(r.j.error+'. We will contact you about your order.')});LS.s('misra.addr',{name:o.name,phone:o.phone,addr:o.addr});
   try{fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({'form-name':'order',order_id:id,name:o.name,phone:o.phone,address:o.addr,items:items.map(i=>`${i.name} (${i.size}/${i.color}) x${i.q}`).join('; '),total:o.total,note:o.note})}).catch(()=>{})}catch(e){}
   S.cart=[];COUP=null;LS.s('misra.coupon',null);saveCart();confetti();
   $('co').innerHTML=`<div class="card" style="text-align:center;padding:60px 24px"><div class="badge" style="width:90px;height:90px;font-size:38px;animation:pu 2s infinite">✓</div><h2>Thank you, ${esc(o.name.split(' ')[0])}!</h2><p style="margin:0 auto 6px">Your order <b style="color:var(--tx)">${id}</b> is placed.</p><p style="margin:0 auto 24px">Total to pay on delivery: <b style="color:var(--tx)">${fmt(o.total)}</b>. We’ll confirm it shortly.</p><a class="btn" href="#track">${tr('Track order')}</a><a class="btn o" href="#shop">${tr('Continue shopping')}</a></div>`}}
 function timeline(o){if(o.status==='Cancelled')return'<p class="er">This order was cancelled.</p>';const ix=ST.indexOf(o.status);return`<div class="steps">${ST.map((s,i)=>`<div class="stp${i<=ix?' on':''}"><i>${i<ix?'✓':i+1}</i>${s}</div>`).join('')}</div>`}
 const oHTML=o=>`<div class="card" style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px"><div><b style="font-weight:500">${o.id}</b><br><small style="color:var(--mu)">${new Date(o.created).toLocaleString()}</small></div><div style="text-align:right"><b style="font-weight:500">${fmt(o.total)}</b><br><span class="tg b">${o.status}</span></div></div>${timeline(o)}<small style="color:var(--mu)">${o.items.map(i=>`${esc(i.name)} ×${i.q}`).join(' · ')}</small></div>`;
-$('tf').onsubmit=e=>{e.preventDefault();const id=$('to').value.trim().toUpperCase(),ph=$('tp').value.replace(/\D/g,'').slice(-11),o=DB.orders.find(x=>x.id===id&&x.phone===ph);$('tres').innerHTML=o?oHTML(o):'<p class="er">We couldn’t find that order. Please check the order ID and phone number.</p>'};
+$('tf').onsubmit=async e=>{e.preventDefault();const id=$('to').value.trim().toUpperCase(),ph=$('tp').value.replace(/\D/g,'').slice(-11);let o=null;const r=await api('track?id='+encodeURIComponent(id)+'&phone='+ph);if(r.ok)o=r.j;else if(r.status===0)o=DB.orders.find(x=>x.id===id&&x.phone===ph);$('tres').innerHTML=o?oHTML(o):'<p class="er">We couldn’t find that order. Please check the order ID and phone number.</p>'};
 /* ===== account / auth ===== */
 function userBtn(){const b=$('ub');b.removeAttribute('data-t');b.textContent=S.user?S.user.name.split(' ')[0]:tr('Sign in');b.href=S.user?'#account':'#login';$('portal').hidden=!isStaff();if(isStaff())b.href='#account'}
 function renderAccount(){if(!S.user){location.hash='#login';return}$('ah').textContent='Hello, '+S.user.name.split(' ')[0];atab('o')}
@@ -493,18 +484,18 @@ function atab(v){Q('#atabs button').forEach(b=>b.classList.toggle('on',b.dataset
  if(v==='p'){c.innerHTML=`<div class="card" style="max-width:520px"><div class="fld"><label>${tr('Full name')}</label><input value="${esc(S.user.name)}" disabled></div><div class="fld"><label>${tr('Email')}</label><input value="${esc(S.user.email||'')}" disabled></div><button class="btn o" data-act="logout">${tr('Sign out')}</button></div>`}}
 let LM='in';
 function lmode(m){LM=m;const up=m==='up';$('nmf').hidden=!up;$('lt').textContent=up?tr('Create an account'):tr('Sign in');$('lte').textContent=up?'Join MISRA':'Welcome back';$('ull').textContent=up?'Email':'Username or email';$('lsub').textContent=up?tr('Create an account'):tr('Sign in');$('lsw').textContent=up?'Already have an account?':'New to MISRA?';$('lmt').textContent=up?tr('Sign in'):tr('Create an account');$('lerr').textContent='';$('lp').autocomplete=up?'new-password':'current-password'}
-function setUser(u,staff){S.user=u;if(staff)sessionStorage.setItem('misra.staff',JSON.stringify(u));else LS.s('misra.user',u);userBtn();saveCart()}
-$('lf').onsubmit=async e=>{e.preventDefault();const u=$('lu').value.trim(),p=$('lp').value,k=u.toLowerCase(),err=$('lerr');err.textContent='';
- try{if(LM==='in'&&STAFF[k]){if(await sha('misra::v1|'+k+'|'+p)===STAFF[k].h){const s=STAFF[k];setUser({name:s.name,role:s.role,email:k},true);access(s);return}err.textContent='Incorrect username or password.';return}
-  if(LM==='up'){const nm=$('ln').value.trim();if(!nm||!u.includes('@')||p.length<6){err.textContent='Enter your name, a valid email and a password of 6+ characters.';return}if(DB.users.find(x=>x.email===k)||STAFF[k]){err.textContent='An account with this email already exists.';return}
-   DB.users.push({name:nm,email:k,h:await sha('misra::c|'+k+'|'+p),created:Date.now()});save();setUser({name:nm,email:k,role:'customer'});toast('Welcome to MISRA, '+nm.split(' ')[0]);location.hash=S.cart.length?'#checkout':'#account';return}
-  const us=DB.users.find(x=>x.email===k);if(us&&us.h===await sha('misra::c|'+k+'|'+p)){setUser({name:us.name,email:k,role:'customer'});toast('Welcome back, '+us.name.split(' ')[0]);location.hash='#account';return}err.textContent='Incorrect username or password.'}catch(x){err.textContent='Sign-in needs a secure (https) connection.'}};
+function setUser(u,staff,tok){S.user=u;if(tok){if(staff)sessionStorage.setItem('misra.tok',tok);else LS.s('misra.tok',tok)}if(staff)sessionStorage.setItem('misra.staff',JSON.stringify(u));else LS.s('misra.user',u);userBtn();saveCart()}
+$('lf').onsubmit=async e=>{e.preventDefault();const u=$('lu').value.trim(),p=$('lp').value,err=$('lerr'),up=LM==='up';err.textContent='';
+ if(up){const nm=$('ln').value.trim();if(!nm||!u.includes('@')||p.length<6){err.textContent='Enter your name, a valid email and a password of 6+ characters.';return}}
+ const r=await api(up?'register':'login',{method:'POST',body:up?{name:$('ln').value.trim(),email:u,password:p}:{username:u,password:p}});
+ if(!r.ok){err.textContent=r.status===0?'Could not reach the server. Please check your connection and try again.':((r.j&&r.j.error)||'Incorrect username or password.');return}
+ const x=r.j.user,st=x.role==='owner'||x.role==='manager';setUser(x,st,r.j.token);
+ if(st){access({role:x.role,name:x.name});await syncAcct(true);return}
+ await syncAcct(true);toast((up?'Welcome to MISRA, ':'Welcome back, ')+x.name.split(' ')[0]);location.hash=up&&S.cart.length?'#checkout':'#account'};
 function access(s){const o=s.role==='owner';$('ph1').textContent=o?'Highest Access Granted':'Manager Access Granted';$('ph2').textContent=`Welcome back, ${s.name}. Opening your control portal.`;$('pop').classList.add('on');confetti();clearTimeout(window.PT);window.PT=setTimeout(enter,3200)}
 function enter(){clearTimeout(window.PT);$('pop').classList.remove('on');location.hash='#admin'}
-function google(){if(!CFG.GOOGLE_CLIENT_ID){toast('Google sign-in activates once a Google Client ID is added. Please create an account with your email for now.');lmode('up');return}
- const go=()=>{google_init()};if(window.google&&google.accounts)go();else{const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=go;document.head.appendChild(s)}}
-function google_init(){google.accounts.id.initialize({client_id:CFG.GOOGLE_CLIENT_ID,callback:r=>{try{const j=JSON.parse(decodeURIComponent(escape(atob(r.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')))));const em=j.email.toLowerCase();if(!DB.users.find(x=>x.email===em)){DB.users.push({name:j.name,email:em,g:1,created:Date.now()});save()}setUser({name:j.name,email:em,role:'customer'});toast('Welcome, '+j.given_name);location.hash='#account'}catch(e){toast('Google sign-in failed')}}});google.accounts.id.prompt()}
-function logout(){S.user=null;sessionStorage.removeItem('misra.staff');LS.s('misra.user',null);userBtn();toast('Signed out');location.hash='#home'}
+async function google(){const r=await api('google',{method:'POST'});if(!r.ok){toast((r.j&&r.j.error)||'Google sign-in is not available right now.');return}setUser(r.j.user,false,'fb');await syncAcct(true);toast('Welcome, '+r.j.user.name.split(' ')[0]);location.hash='#account'}
+function logout(){try{fbOut()}catch(e){}S.user=null;sessionStorage.removeItem('misra.staff');sessionStorage.removeItem('misra.tok');LS.s('misra.tok',null);LS.s('misra.user',null);S.cart=[];S.wish=[];DB.orders=[];DB.users=[];saveCart();userBtn();toast('Signed out');location.hash='#home'}
 /* ===== help ===== */
 const FAQ=[['How do I pay?','MISRA accepts Cash on Delivery only. Place your order online and pay in cash when it reaches you.'],['How long does delivery take?',()=>dl()+'. Delivery is free on orders over '+fmt(DB.settings.free)+'.'],['How do I track my order?','Open Track Order, enter your order ID and the phone number you used at checkout.'],['How does virtual try-on work?','Design a dress in 3D, or upload a photo and place any MISRA piece on it. Photos stay on your device.'],['How do I choose my size?','Pick your usual size on the product page. If you are unsure, send us a message and we will help.']];
 function renderFaq(){$('faq').innerHTML=FAQ.map(([q,a])=>`<div class="acc"><button data-act="acc"><span style="max-width:90%">${q}</span><span>+</span></button><div><p style="padding-bottom:20px">${typeof a==='function'?a():a}</p></div></div>`).join('')}
@@ -599,7 +590,7 @@ function admin(t){AT=t;$('atit').textContent=ATI[t];Q('.as [data-act=at]').forEa
   <div class="tw" style="margin-top:20px"><table><tr><th>Code</th><th>Discount</th><th>Min order</th><th>Active</th><th></th></tr>${DB.coupons.map((c,i)=>`<tr><td><b>${esc(c.code)}</b></td><td>${c.type==='pct'?c.val+'%':fmt(c.val)}</td><td>${fmt(c.min)}</td><td><button class="tgl${c.on?' on':''}" data-act="ctog" data-i="${i}"></button></td><td><button class="btn o sm" style="margin:0" data-act="cdel" data-i="${i}">✕</button></td></tr>`).join('')}</table></div>`;
   $('cof2').onsubmit=e=>{e.preventDefault();const code=$('k1').value.trim().toUpperCase();if(DB.coupons.find(c=>c.code===code)){toast('That code exists');return}DB.coupons.push({code,type:$('k2').value,val:+$('k3').value,min:+$('k4').value||0,on:true});save(true);admin('cou')}}
  if(t==='set'){const s=DB.settings;m.innerHTML=`<form id="sf" class="card" style="max-width:720px"><div class="fld"><label>Announcement bar</label><input id="s1" value="${esc(s.ann)}"></div><div class="two"><div class="fld"><label>Delivery fee: Dhaka ৳</label><input id="s2" type="number" value="${s.dhaka}"></div><div class="fld"><label>Delivery fee: outside ৳</label><input id="s3" type="number" value="${s.out}"></div></div><div class="two"><div class="fld"><label>Free delivery over ৳</label><input id="s4" type="number" value="${s.free}"></div><div class="fld"><label>Low-stock alert at</label><input id="s5" type="number" value="${s.low}"></div></div><div class="two"><div class="fld"><label>Dhaka delivery days</label><input id="s6" value="${esc(s.dDays)}"></div><div class="fld"><label>Outside Dhaka days</label><input id="s7" value="${esc(s.oDays)}"></div></div><button class="btn">Save settings</button></form>
-  <div class="card" style="max-width:720px;margin-top:22px"><h3>Publish & backup</h3><p style="max-width:none;margin:8px 0 16px">Your changes are saved in this browser. To show them to every customer, export the catalog and upload <b>catalog.json</b> beside <b>index.html</b> on Netlify, then redeploy. Orders also arrive in your Netlify Forms inbox.</p><button class="btn" data-act="expcat">Export catalog.json</button><button class="btn o" data-act="expbk">Backup (all data)</button><button class="btn o" data-act="impbk">Restore backup</button><button class="btn o" data-act="samp">Load sample orders</button><button class="btn o" data-act="reset" style="color:#e57373">Reset all data</button><input type="file" id="bkf" accept=".json" hidden></div>`;
+  <div class="card" style="max-width:720px;margin-top:22px"><h3>Publish & backup</h3><p style="max-width:none;margin:8px 0 16px">Everything you change here is published live to every customer, on every device, within seconds. Orders and customer accounts are stored on the server, so they look the same from wherever you sign in.</p><button class="btn" data-act="expcat">Export catalog.json</button><button class="btn o" data-act="expbk">Backup (all data)</button><button class="btn o" data-act="impbk">Restore backup</button><button class="btn o" data-act="samp">Load sample orders</button><input type="file" id="bkf" accept=".json" hidden></div>`;
   $('sf').onsubmit=e=>{e.preventDefault();Object.assign(DB.settings,{ann:$('s1').value,dhaka:+$('s2').value,out:+$('s3').value,free:+$('s4').value,low:+$('s5').value,dDays:$('s6').value,oDays:$('s7').value});save(true);renderHome();toast('Settings saved')};
   $('bkf').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());if(!d.products)throw 0;DB=d;save();toast('Backup restored');admin('set')}catch(x){toast('That file is not a valid backup')}}}}
 function custs(){const m={};DB.users.forEach(u=>m[u.email]={name:u.name,contact:u.email,n:0,spent:0});DB.orders.forEach(o=>{const k=o.phone;const e=m[o.uid]||m[k]||(m[k]={name:o.name,contact:o.phone+(o.email?' · '+o.email:''),n:0,spent:0});e.n++;if(o.status!=='Cancelled')e.spent+=o.total});return Object.values(m)}
@@ -666,10 +657,74 @@ function silk(){const c=$('bg'),x=c.getContext('2d');let fc=0,W,H,mx=.5,my=.5,tx
   x.lineWidth=D;for(let k=0;k<(innerWidth<700?6:12);k++){x.beginPath();const y0=H*(.12+k*.072);for(let xx=0;xx<=W;xx+=22){const d=Math.hypot(xx-mx*W,y0-my*H),bump=-46*D*Math.exp(-d*d/(2*(170*D)**2)),y=y0+Math.sin(xx*.0035/D+t*1.5+k*.5+sy*.0015)*38*D+Math.sin(xx*.01/D-t*2+k)*12*D+bump;xx?x.lineTo(xx,y):x.moveTo(xx,y)}x.strokeStyle=`rgba(122,74,43,${.05+.025*Math.sin(t+k)})`;x.stroke()}
   mo.forEach(m=>{m.y-=m.v*16;if(m.y<-.02)m.y=1.02;const a=.18+.14*Math.sin(t*3+m.p);x.fillStyle=`rgba(150,100,60,${a})`;x.beginPath();x.arc(m.x*W+Math.sin(t+m.p)*14*D,m.y*H,m.r*D,0,7);x.fill()});
   const g2=x.createRadialGradient(mx*W,my*H,0,mx*W,my*H,300*D);g2.addColorStop(0,'rgba(201,150,107,.16)');g2.addColorStop(1,'rgba(201,150,107,0)');x.fillStyle=g2;x.fillRect(0,0,W,H)})(0)}
+
+/* ===== live shared data (server sync) ===== */
+var SRV=false,EMPTY=false,CAT_VER='',ORD={},pt,mt,PUSHING=false;
+
+/* ===== Firebase data layer (Auth + Firestore). Replaces the previous server calls. ===== */
+var FBU=null,FBREADY=false,FBM=null,FBDB=null,FBAUTH=null,FBINIT=null,PROD=new Map(),CONF=null,ORDS=[],USERS=[],FBREV=0,STAFFL=null,PRODL=false,GOT={};
+const FBCFG=window.MISRA_FIREBASE,SE='@misra.staff';
+const fbOn=()=>!!(FBCFG&&FBCFG.apiKey&&!/^PASTE/.test(FBCFG.apiKey));
+const isStaffEmail=e=>!!e&&String(e).toLowerCase().endsWith(SE);
+const roleOf=e=>isStaffEmail(e)?(String(e).toLowerCase().startsWith('srabonti@')?'owner':'manager'):'customer';
+function mkUser(u){const em=(u.email||'').toLowerCase(),r=roleOf(em);return{name:r==='customer'?(u.displayName||em.split('@')[0]):em.split('@')[0].replace(/^./,c=>c.toUpperCase()),email:em,role:r}}
+const cl=o=>JSON.parse(JSON.stringify(o)),sk=v=>Array.isArray(v)?v.map(sk):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,sk(v[k])])):v,same=(a,b)=>JSON.stringify(sk(a))===JSON.stringify(sk(b));
+const fo=d=>({...d,uid:d.uemail||d.uid||''});
+function TOK(){return fbOn()?(FBREADY?(FBU?'fb':null):(S.user?'fb':null)):null}
+function fbChanged(){try{if(DB)poll()}catch(e){}}
+function fbOut(){if(FBAUTH)FBM.auth.signOut(FBAUTH)}
+function waitGot(k){return new Promise(res=>{const t=setInterval(()=>{if(k.every(x=>GOT[x])){clearInterval(t);res()}},40);setTimeout(()=>{clearInterval(t);res()},8000)})}
+function fbInit(){if(FBINIT)return FBINIT;FBINIT=(async()=>{const B='https://www.gstatic.com/firebasejs/10.14.1/',M=window.__FBMOCK||{app:await import(B+'firebase-app.js'),auth:await import(B+'firebase-auth.js'),fs:await import(B+'firebase-firestore.js')};FBM=M;const app=M.app.initializeApp(FBCFG);FBAUTH=M.auth.getAuth(app);FBDB=M.fs.initializeFirestore(app,{localCache:M.fs.persistentLocalCache({tabManager:M.fs.persistentMultipleTabManager()})});
+ await new Promise(res=>{M.auth.onAuthStateChanged(FBAUTH,u=>{FBU=u;FBREADY=true;if(!u){if(S.user){S.user=null;LS.s('misra.user',null);sessionStorage.removeItem('misra.staff');try{userBtn()}catch(e){}}stopStaff()}else if(isStaffEmail(u.email))startStaff();res()})})})();return FBINIT}
+function startCat(){if(PRODL)return;PRODL=true;const F=FBM.fs;F.onSnapshot(F.collection(FBDB,'products'),sn=>{PROD=new Map(sn.docs.map(d=>[d.id,d.data()]));GOT.p=1;FBREV++;fbChanged()},e=>{console.warn(e);GOT.p=1});F.onSnapshot(F.doc(FBDB,'config','store'),sn=>{CONF=sn.exists()?sn.data():null;GOT.c=1;FBREV++;fbChanged()},e=>{console.warn(e);GOT.c=1})}
+function startStaff(){if(STAFFL)return;const F=FBM.fs;STAFFL=[F.onSnapshot(F.collection(FBDB,'orders'),sn=>{ORDS=sn.docs.map(d=>fo(d.data()));GOT.o=1;stockSweep(sn.docs);fbChanged()},e=>{console.warn(e);GOT.o=1}),F.onSnapshot(F.collection(FBDB,'users'),sn=>{USERS=sn.docs.map(d=>({name:d.data().name,email:d.data().email,created:d.data().created||0}));GOT.u=1;fbChanged()},e=>{console.warn(e);GOT.u=1})]}
+function stopStaff(){(STAFFL||[]).forEach(f=>{try{f()}catch(e){}});STAFFL=null;ORDS=[];USERS=[];GOT.o=GOT.u=0}
+async function stockSweep(docs){const F=FBM.fs;for(const d of docs){const o=d.data();if(o.stocked||String(d.id).endsWith('-DEMO'))continue;try{await F.runTransaction(FBDB,async tx=>{const od=await tx.get(d.ref);if(od.data().stocked)return;const need={};(od.data().items||[]).forEach(i=>need[i.pid]=(need[i.pid]||0)+(+i.q||0));const ups=[];for(const pid in need){const r=F.doc(FBDB,'products',pid),sn=await tx.get(r);if(sn.exists())ups.push([r,Math.max(0,(sn.data().stock||0)-need[pid])])}ups.forEach(([r,n])=>tx.update(r,{stock:n}));tx.update(d.ref,{stocked:true})})}catch(e){console.warn(e)}}}
+const FBERR={'auth/invalid-credential':[401,'Incorrect username or password.'],'auth/wrong-password':[401,'Incorrect username or password.'],'auth/user-not-found':[401,'Incorrect username or password.'],'auth/invalid-login-credentials':[401,'Incorrect username or password.'],'auth/email-already-in-use':[409,'An account with this email already exists.'],'auth/weak-password':[400,'Choose a password of 6+ characters.'],'auth/invalid-email':[400,'Enter a valid email address.'],'auth/too-many-requests':[429,'Too many attempts. Please wait a few minutes and try again.'],'auth/popup-closed-by-user':[400,'Sign-in was cancelled.'],'auth/cancelled-popup-request':[400,'Sign-in was cancelled.'],'permission-denied':[403,'You do not have permission to do that.']};
+async function api(p,o={}){if(!fbOn())return{ok:false,status:0,j:null};
+ const m=o.method||'GET',b=o.body||{},[path,qs]=p.split('?'),parts=path.split('/'),R=(j,s=200)=>({ok:s<300,status:s,j}),E=(e,s)=>R({error:e},s),Q=new URLSearchParams(qs||'');
+ try{await fbInit();const A=FBM.auth,F=FBM.fs,u=FBAUTH.currentUser,staff=!!(u&&isStaffEmail(u.email));
+ if(path==='config')return R({googleClientId:'firebase'});
+ if(path==='catalog'&&m==='GET'){startCat();await waitGot(['p','c']);if(!PROD.size&&!CONF)return R({empty:true});const ver='fb'+FBREV;if(Q.get('v')===ver)return R({same:true,ver});return R({ver,products:cl([...PROD.values()]).sort((a,c)=>(c.created||0)-(a.created||0)),coupons:CONF&&cl(CONF.coupons||[]),settings:CONF&&CONF.settings&&cl(CONF.settings)})}
+ if(path==='catalog'&&m==='PUT'){if(!staff)return E('Staff only',403);const w=F.writeBatch(FBDB),ids=new Set();for(const p of b.products){ids.add(p.id);const c=cl(p);if(!same(PROD.get(p.id),c))w.set(F.doc(FBDB,'products',p.id),c)}for(const id of PROD.keys())if(!ids.has(id))w.delete(F.doc(FBDB,'products',id));const cf=cl({coupons:b.coupons||[],settings:b.settings||{}});if(!same(CONF,cf))w.set(F.doc(FBDB,'config','store'),cf);await w.commit();return R({ok:true,ver:'fb'+FBREV})}
+ if(path==='img'&&m==='POST')return b.d&&b.d.length<750000?R({url:b.d}):E('That photo is too large. Please use a smaller image.',413);
+ if(path==='login'&&m==='POST'){const un=(b.username||'').trim().toLowerCase(),em=un.includes('@')?un:un+SE;await A.setPersistence(FBAUTH,isStaffEmail(em)?A.browserSessionPersistence:A.browserLocalPersistence);const c=await A.signInWithEmailAndPassword(FBAUTH,em,b.password||'');return R({token:'fb',user:mkUser(c.user)})}
+ if(path==='register'&&m==='POST'){const em=(b.email||'').trim().toLowerCase();if(isStaffEmail(em))return E('That email cannot be used.',400);await A.setPersistence(FBAUTH,A.browserLocalPersistence);const c=await A.createUserWithEmailAndPassword(FBAUTH,em,b.password||'');try{await A.updateProfile(c.user,{displayName:b.name})}catch(e){}await F.setDoc(F.doc(FBDB,'users',c.user.uid),{name:b.name,email:em,created:Date.now(),wish:[],cart:[],addr:null});return R({token:'fb',user:{name:b.name,email:em,role:'customer'}})}
+ if(path==='google'&&m==='POST'){await A.setPersistence(FBAUTH,A.browserLocalPersistence);const c=await A.signInWithPopup(FBAUTH,new A.GoogleAuthProvider()),r=F.doc(FBDB,'users',c.user.uid);if(!(await F.getDoc(r)).exists())await F.setDoc(r,{name:c.user.displayName||'',email:(c.user.email||'').toLowerCase(),created:Date.now(),wish:[],cart:[],addr:null});return R({token:'fb',user:mkUser(c.user)})}
+ if(path==='me'&&m==='GET'){if(!u)return E('Sign in required',401);const sn=await F.getDoc(F.doc(FBDB,'users',u.uid)),d=sn.exists()?sn.data():{},q=await F.getDocs(F.query(F.collection(FBDB,'orders'),F.where('uid','==',u.uid)));return R({wish:d.wish||[],cart:d.cart||[],addr:d.addr||null,orders:q.docs.map(x=>fo(x.data())).sort((a,c)=>c.created-a.created)})}
+ if(path==='me'&&m==='PUT'){if(!u)return E('Sign in required',401);await F.setDoc(F.doc(FBDB,'users',u.uid),cl({wish:b.wish||[],cart:b.cart||[],addr:b.addr||null}),{merge:true});return R({ok:true})}
+ if(path==='order'&&m==='POST'){const its=(b.items||[]).slice(0,50).map(i=>{const p=PROD.get(i.pid);return{pid:String(i.pid).slice(0,40),name:String(i.name||'').slice(0,120),size:String(i.size||'').slice(0,20),color:String(i.color||'').slice(0,30),q:Math.max(1,Math.min(20,+i.q||1)),price:p?(p.sale&&p.sale<p.price?p.sale:p.price):Math.max(0,+i.price||0)}});if(!its.length)return E('Your cart is empty',400);const sub=its.reduce((a,i)=>a+i.price*i.q,0),mf=Math.max(+(CONF&&CONF.settings&&CONF.settings.dhaka)||60,+(CONF&&CONF.settings&&CONF.settings.out)||120),fee=Math.max(0,Math.min(mf,+b.fee||0)),disc=Math.max(0,Math.min(sub,+b.disc||0)),now=Date.now(),id=/^MS-[0-9A-Z-]{6,30}$/.test(b.id||'')?b.id:'MS-'+now.toString(36).toUpperCase()+Math.random().toString(36).slice(2,8).toUpperCase();
+  const o={id,items:its,sub,disc,coupon:String(b.coupon||'').slice(0,30),fee,total:sub-disc+fee,name:String(b.name||'').trim().slice(0,80),phone:String(b.phone||'').replace(/\D/g,'').slice(0,20),email:String(b.email||'').slice(0,120),zone:b.zone==='dhaka'?'dhaka':'out',addr:String(b.addr||'').slice(0,300),note:String(b.note||'').slice(0,400),status:'Placed',pay:'Cash on Delivery',created:now,hist:[{s:'Placed',t:now}],uid:u?u.uid:'',uemail:u?(u.email||'').toLowerCase():'',stocked:false};
+  if(!o.name||o.phone.length<10||!o.addr)return E('Please complete your delivery details',400);await F.setDoc(F.doc(FBDB,'orders',id),o);return R({ok:true,order:fo(o)})}
+ if(path==='track'&&m==='GET'){const id=(Q.get('id')||'').toUpperCase(),ph=(Q.get('phone')||'').replace(/\D/g,'').slice(-11),sn=await F.getDoc(F.doc(FBDB,'orders',id));if(sn.exists()&&String(sn.data().phone).replace(/\D/g,'').slice(-11)===ph)return R(fo(sn.data()));return E('Not found',404)}
+ if(path==='orders'&&m==='GET'){if(!staff)return E('Staff only',403);startStaff();await waitGot(['o']);return R(ORDS.slice().sort((a,c)=>c.created-a.created))}
+ if(parts[0]==='orders'&&parts[1]&&m==='PUT'){if(!staff)return E('Staff only',403);const{uid,...rest}=cl(b);await F.setDoc(F.doc(FBDB,'orders',parts[1]),rest,{merge:true});return R({ok:true})}
+ if(path==='users'&&m==='GET'){if(!staff)return E('Staff only',403);startStaff();await waitGot(['u']);return R(USERS.slice())}
+ return E('Not found',404)}
+ catch(e){const x=FBERR[e&&e.code];if(x)return{ok:false,status:x[0],j:{error:x[1]}};console.warn(e);return{ok:false,status:0,j:null}}}
+function applyCat(j){DB.products=j.products;DB.coupons=j.coupons||[];DB.settings=j.settings||DB.settings;CAT_VER=j.ver;SRV=true;EMPTY=false;LS.s('misra.db',DB)}
+function isMgr(){return S.user&&(S.user.role==='owner'||S.user.role==='manager')&&TOK()}
+function pushSoon(){if(!isMgr()||!(SRV||EMPTY))return;clearTimeout(pt);pt=setTimeout(push,700)}
+async function push(){if(PUSHING){pushSoon();return}PUSHING=true;try{
+ for(const p of DB.products){if(typeof p.img==='string'&&p.img.startsWith('data:')){const r=await api('img',{method:'POST',body:{d:p.img}});if(r.ok)p.img=r.j.url}}
+ const r=await api('catalog',{method:'PUT',body:{ver:CAT_VER,products:DB.products,coupons:DB.coupons,settings:DB.settings}});
+ if(r.ok){CAT_VER=r.j.ver;SRV=true;EMPTY=false;LS.s('misra.db',DB);toast('Live for everyone ✓')}
+ else if(r.status===409){toast('Another staff member just changed the store. The latest version is loaded, please redo your change.');const c=await api('catalog');if(c.ok&&c.j.products)applyCat(c.j)}
+ else if(r.status!==401)toast('Could not publish. Check your connection and try again.');
+ for(const o of DB.orders){if(String(o.id).endsWith('-DEMO'))continue;const sn=JSON.stringify(o);if(ORD[o.id]!==undefined&&ORD[o.id]!==sn){const x=await api('orders/'+o.id,{method:'PUT',body:o});if(x.ok)ORD[o.id]=sn}}
+}finally{PUSHING=false}}
+function meSoon(){if(!S.user||S.user.role!=='customer'||!TOK())return;clearTimeout(mt);mt=setTimeout(()=>api('me',{method:'PUT',body:{wish:S.wish,cart:S.cart,addr:LS.g('misra.addr',null)}}),900)}
+async function syncAcct(first){if(!S.user||!TOK())return;
+ if(isMgr()){const o=await api('orders');if(o.ok){if(!first&&DB.orders.length&&o.j.length>DB.orders.length)toast('New order received ✦');DB.orders=o.j;ORD={};o.j.forEach(x=>ORD[x.id]=JSON.stringify(x))}const u=await api('users');if(u.ok)DB.users=u.j;if(first&&EMPTY)push();return}
+ const r=await api('me');if(!r.ok)return;const j=r.j;
+ if(first){S.wish=[...new Set([...S.wish,...j.wish])];if(!S.cart.length&&j.cart.length)S.cart=j.cart.filter(i=>P(i.pid));if(j.addr)LS.s('misra.addr',j.addr);saveCart()}
+ DB.orders=j.orders}
+function rerender(){const a=document.activeElement;if(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))return;if($('admin')&&$('admin').classList.contains('on'))return;try{route(true)}catch(e){}}
+async function poll(){try{const r=await api('catalog?v='+encodeURIComponent(CAT_VER));if(r.ok&&r.j&&r.j.products&&r.j.ver!==CAT_VER){applyCat(r.j);if(!document.hidden)rerender()}await syncAcct(false)}catch(e){}}
 /* ===== boot ===== */
 async function boot(){Q('[data-img]').forEach(i=>i.src='data:image/'+(i.dataset.img==='logo'?'png':'webp')+';base64,'+IMG[i.dataset.img]);
- if(!DB||!DB.edited){try{const r=await fetch('catalog.json?'+Date.now());if(r.ok){const c=await r.json();if(c.products&&c.products.length){DB=DB||defaults();DB.products=c.products;DB.coupons=c.coupons||DB.coupons;DB.settings=c.settings||DB.settings}}}catch(e){}}
- if(!DB||!DB.products)DB=defaults();DB.orders=DB.orders||[];addSeeds();DB.users=DB.users||[];document.documentElement.dataset.theme=S.theme;
+ try{const c=await api('config');if(c.ok&&c.j)CFG.GOOGLE_CLIENT_ID=c.j.googleClientId||'';const r=await api('catalog');if(r.ok&&r.j){if(r.j.empty){SRV=true;EMPTY=true}else{DB=DB||defaults();applyCat(r.j)}}}catch(e){}
+ if(!DB||!DB.products)DB=defaults();DB.orders=DB.orders||[];if(!SRV||EMPTY)addSeeds();DB.users=DB.users||[];document.documentElement.dataset.theme=S.theme;
    i18n();saveCart();route();try{silk()}catch(e){}
  }
 addEventListener('scroll',()=>{$('pg').style.transform='scaleX('+(scrollY/Math.max(1,document.documentElement.scrollHeight-innerHeight))+')'},{passive:true});
@@ -680,118 +735,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('.btn,.cat,.pc .p
 let _ly=0,_sk=0;addEventListener('scroll',()=>{_sk+=(scrollY-_ly)*.05;_ly=scrollY},{passive:true});(function sk(){_sk*=.9;document.documentElement.style.setProperty('--sk',Math.max(-4,Math.min(4,_sk))+'deg');requestAnimationFrame(sk)})();
 setInterval(()=>Q('.page.on .card:not(.tilt),.page.on .cat:not(.tilt)').forEach(e=>e.classList.add('tilt')),700);
 addEventListener('hashchange',()=>document.body.classList.remove('menu'));document.addEventListener('click',e=>{if(e.target.closest('#mnav a'))setTimeout(()=>document.body.classList.remove('menu'),50)});
-boot();setTimeout(()=>{const h=Q('.hlogo')[0];if(h)Q('.lgs').forEach(e=>{e.style.webkitMaskImage=e.style.maskImage='url('+h.src+')'})},400);
-</script>
-
- <!-- Your existing store HTML code above -->
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-// (All your main store script code remains right here...)
-boot();setTimeout(()=>{const h=Q('.hlogo')[0];if(h)Q('.lgs').forEach(e=>{e.style.webkitMaskImage=e.style.maskImage='url('+h.src+')'})},400);
-</script>
-
-<!-- Firebase Cloud Sync Integration -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, collection, setDoc, doc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-      apiKey: "AIzaSyAjSr_VJXStfSunzTyWa6PvGLHR8a1ZiKQ",
-      authDomain: "misrashop.firebaseapp.com",
-      projectId: "misrashop",
-      storageBucket: "misrashop.firebasestorage.app",
-      messagingSenderId: "14447331143",
-      appId: "1:14447331143:web:837fff0a6c27e1fa9bae62",
-      measurementId: "G-7EZTHCGKH2"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  // Load cloud products automatically when the page opens
-  async function initCloudSync() {
-      try {
-          const querySnapshot = await getDocs(collection(db, "products"));
-          if (!querySnapshot.empty) {
-              DB.products = [];
-              querySnapshot.forEach(docSnap => {
-                  DB.products.push(docSnap.data());
-              });
-              if (typeof renderHome === 'function') renderHome();
-              if (typeof grid === 'function') grid();
-              console.log("Loaded products from Firebase cloud!");
-          }
-      } catch (e) {
-          console.error("Error loading cloud products:", e);
-      }
-  }
-  initCloudSync();
-
-  // Automatically sync product updates to Firebase cloud
-  const originalSave = window.save || function() {};
-  window.save = async function(edit) {
-      originalSave(edit);
-      try {
-          for (const p of DB.products) {
-              await setDoc(doc(db, "products", p.id), p);
-          }
-          console.log("Products synced to Firebase cloud successfully!");
-      } catch (e) {
-          console.error("Cloud sync error:", e);
-      }
-  };
-</script>
-
- <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, collection, setDoc, doc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-      apiKey: "AIzaSyAjSr_VJXStfSunzTyWa6PvGLHR8a1ZiKQ",
-      authDomain: "misrashop.firebaseapp.com",
-      databaseURL: "https://misrashop-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "misrashop",
-      storageBucket: "misrashop.firebasestorage.app",
-      messagingSenderId: "14447331143",
-      appId: "1:14447331143:web:837fff0a6c27e1fa9bae62"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  // Load cloud products automatically when the page opens
-  async function initCloudSync() {
-      try {
-          const querySnapshot = await getDocs(collection(db, "products"));
-          if (!querySnapshot.empty) {
-              DB.products = [];
-              querySnapshot.forEach(docSnap => {
-                  DB.products.push(docSnap.data());
-              });
-              if (typeof renderHome === 'function') renderHome();
-              if (typeof grid === 'function') grid();
-              console.log("Loaded products from Firebase cloud!");
-          }
-      } catch (e) {
-          console.error("Error loading cloud products:", e);
-      }
-  }
-  initCloudSync();
-
-  // Automatically sync product updates to Firebase cloud
-  const originalSave = window.save || function() {};
-  window.save = async function(edit) {
-      originalSave(edit);
-      try {
-          for (const p of DB.products) {
-              await setDoc(doc(db, "products", p.id), p);
-          }
-          console.log("Products synced to Firebase cloud successfully!");
-      } catch (e) {
-          console.error("Cloud sync error:", e);
-      }
-  };
+boot().then(()=>{syncAcct(true);setInterval(poll,10000);document.addEventListener('visibilitychange',()=>{if(!document.hidden){poll();rerender()}})});setTimeout(()=>{const h=Q('.hlogo')[0];if(h)Q('.lgs').forEach(e=>{e.style.webkitMaskImage=e.style.maskImage='url('+h.src+')'})},400);
 </script>
 </body>
 </html>
