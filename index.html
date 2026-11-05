@@ -685,49 +685,29 @@ boot();setTimeout(()=>{const h=Q('.hlogo')[0];if(h)Q('.lgs').forEach(e=>{e.style
 
  <!-- Your existing store HTML code above -->
 
-    <!-- Paste your Firebase script right here before body closes -->
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// (All your main store script code remains right here...)
+boot();setTimeout(()=>{const h=Q('.hlogo')[0];if(h)Q('.lgs').forEach(e=>{e.style.webkitMaskImage=e.style.maskImage='url('+h.src+')'})},400);
+</script>
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyAjSr_VJXStfSunzTyWa6PvGLHR8a1ZiKQ",
-        authDomain: "misrashop.firebaseapp.com",
-        projectId: "misrashop",
-        storageBucket: "misrashop.firebasestorage.app",
-        messagingSenderId: "14447331143",
-        appId: "1:14447331143:web:837fff0a6c27e1fa9bae62",
-        measurementId: "G-7EZTHCGKH2"
-      };
-
-      const app = initializeApp(firebaseConfig);
-      const analytics = getAnalytics(app);
-    </script>
-  </body>
-</html>
-
+<!-- Firebase Cloud Sync Integration -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, collection, setDoc, doc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // Initialize Firestore using your configuration
-  const app = initializeApp(window.MISRA_FIREBASE);
-  const db = getFirestore(app);
-
-  // Hook into your global save function so products sync instantly to Firebase
-  const originalSave = window.save || function() {};
-  window.save = async function(edit) {
-      originalSave(edit);
-      try {
-          // Push every product to Firestore cloud database
-          for (const p of DB.products) {
-              await setDoc(doc(db, "products", p.id), p);
-          }
-          console.log("Synced to cloud successfully!");
-      } catch (e) {
-          console.error("Cloud sync error: ", e);
-      }
+  const firebaseConfig = {
+      apiKey: "AIzaSyAjSr_VJXStfSunzTyWa6PvGLHR8a1ZiKQ",
+      authDomain: "misrashop.firebaseapp.com",
+      projectId: "misrashop",
+      storageBucket: "misrashop.firebasestorage.app",
+      messagingSenderId: "14447331143",
+      appId: "1:14447331143:web:837fff0a6c27e1fa9bae62",
+      measurementId: "G-7EZTHCGKH2"
   };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
   // Load cloud products automatically when the page opens
   async function initCloudSync() {
@@ -740,13 +720,28 @@ boot();setTimeout(()=>{const h=Q('.hlogo')[0];if(h)Q('.lgs').forEach(e=>{e.style
               });
               if (typeof renderHome === 'function') renderHome();
               if (typeof grid === 'function') grid();
-              console.log("Loaded products from cloud!");
+              console.log("Loaded products from Firebase cloud!");
           }
       } catch (e) {
-          console.error("Error loading cloud products: ", e);
+          console.error("Error loading cloud products:", e);
       }
   }
   initCloudSync();
+
+  // Automatically sync product updates to Firebase cloud
+  const originalSave = window.save || function() {};
+  window.save = async function(edit) {
+      originalSave(edit);
+      try {
+          for (const p of DB.products) {
+              await setDoc(doc(db, "products", p.id), p);
+          }
+          console.log("Products synced to Firebase cloud successfully!");
+      } catch (e) {
+          console.error("Cloud sync error:", e);
+      }
+  };
 </script>
+
 </body>
 </html>
