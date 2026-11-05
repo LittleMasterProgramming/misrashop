@@ -672,5 +672,28 @@ setInterval(()=>Q('.page.on .card:not(.tilt),.page.on .cat:not(.tilt)').forEach(
 addEventListener('hashchange',()=>document.body.classList.remove('menu'));document.addEventListener('click',e=>{if(e.target.closest('#mnav a'))setTimeout(()=>document.body.classList.remove('menu'),50)});
 boot();setTimeout(()=>{const h=Q('.hlogo')[0];if(h)Q('.lgs').forEach(e=>{e.style.webkitMaskImage=e.style.maskImage='url('+h.src+')'})},400);
 </script>
+
+ <!-- Your existing store HTML code above -->
+
+    <!-- Paste your Firebase script right here before body closes -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyAjSr_VJXStfSunzTyWa6PvGLHR8a1ZiKQ",
+        authDomain: "misrashop.firebaseapp.com",
+        projectId: "misrashop",
+        storageBucket: "misrashop.firebasestorage.app",
+        messagingSenderId: "14447331143",
+        appId: "1:14447331143:web:837fff0a6c27e1fa9bae62",
+        measurementId: "G-7EZTHCGKH2"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+    </script>
+  </body>
+</html>
 </body>
 </html>
